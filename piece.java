@@ -19,7 +19,6 @@ public class piece {
         this.shape = '-';
     }
 
-
     public boolean compareSizeTo(piece p) {
         return this.size >= p.getSize();
     }
@@ -37,7 +36,7 @@ public class piece {
     }
 
     public String toString() {
-        return this.shape + "." + this.size;
+        return this.shape + "" + this.size;
     }
 
     public String shapeToString() {

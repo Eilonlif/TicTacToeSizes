@@ -39,7 +39,6 @@ public class board {
     public void insert(player player, int i, int j, int pieceSizeIndex) {
         if (0 <= i && i < this.boardSize && 0 <= j && j < this.boardSize) {
             this.board[i][j] = new piece(player.getPiece(pieceSizeIndex));
-            player.getPieces()[pieceSizeIndex] = new piece();
         }
     }
 
@@ -58,11 +57,8 @@ public class board {
                 for (int j = 0; j < this.boardSize; j++) {
                     b.append("-------");
                 }
-                b.append("-");
+                b.append("\n");
             }
-            b.append("\n");
-
-
         }
         return b.toString();
     }
@@ -133,9 +129,5 @@ public class board {
 
     public int getBoardSize() {
         return this.boardSize;
-    }
-
-    public piece[][] getBoard() {
-        return this.board;
     }
 }
