@@ -20,26 +20,28 @@ public class piece {
     }
 
     public boolean compareSizeTo(piece p) {
-        return this.size >= p.getSize();
+        return this.size > p.getSize();
     }
 
     public boolean compareShapeTo(piece p) {
-        return this.shape != p.getShape();
+        return this.shape == p.getShape();
     }
 
     public int getSize() {
-        return size;
+        return this.size;
     }
 
     public char getShape() {
-        return shape;
+        return this.shape;
     }
 
     public String toString() {
-        return this.shape + "" + this.size;
+        return this.shape + "." + this.size;
     }
 
     public String shapeToString() {
         return "" + this.shape;
     }
+
+    //TODO add clone?
 }

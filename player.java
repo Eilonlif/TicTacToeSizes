@@ -26,6 +26,13 @@ public class player {
         }
     }
 
+    public player(char shape, int numOfPieces, int num, piece[] pieces) {
+        this.shape = shape;
+        this.num = num;
+        this.numOfPieces = numOfPieces;
+        this.pieces = pieces;
+    }
+
     public int getNumOfPieces() {
         return this.numOfPieces;
     }
@@ -39,7 +46,7 @@ public class player {
     }
 
     public piece getPiece(int i) {
-        if (i >= this.pieces.length) {
+        if (i >= this.pieces.length || i < 0) {
             return null;
         }
         return this.pieces[i];
@@ -55,5 +62,15 @@ public class player {
 
     public int getNum() {
         return this.num;
+    }
+
+    public player clone() { //TODO idk whats wrong
+        piece[] t = this.pieces.clone();
+//        piece[] tmp = new piece[this.numOfPieces];
+//        for (int i = 0; i < this.numOfPieces; i++) {
+//            tmp[i] = new piece(this.pieces[i]);
+//        }
+//        return new player(this.shape, this.numOfPieces, this.num, tmp);
+        return new player(this.shape, this.numOfPieces, this.num, t);
     }
 }

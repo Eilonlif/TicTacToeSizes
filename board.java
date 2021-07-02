@@ -27,7 +27,12 @@ public class board {
         }
     }
 
-    public boolean isEnd(player p1, player p2) { //TODO not so sure that its good
+    public board(piece[][] b, int boardSize) {
+        this.boardSize = boardSize;
+        this.board = b;
+    }
+
+    public boolean isGameEnded(player p1, player p2) {
         for (int i = 0; i < p1.getNumOfPieces(); i++) {
             if (p1.getPieces()[i].getSize() != -1 || p2.getPieces()[i].getSize() != -1) {
                 return false;
@@ -36,10 +41,16 @@ public class board {
         return true;
     }
 
-    public void insert(player player, int i, int j, int pieceSizeIndex) {
+    public piece[][] insert(player player, int i, int j, int pieceSizeIndex) {
         if (0 <= i && i < this.boardSize && 0 <= j && j < this.boardSize) {
             this.board[i][j] = new piece(player.getPiece(pieceSizeIndex));
         }
+        for (int k = 0; k < this.boardSize; k++) {
+            for (int l = 0; l < this.boardSize; l++) {
+                this.board[k][l] = new piece(this.board[k][l]);
+            }
+        }
+        return this.board;
     }
 
     public String toString() {
@@ -60,7 +71,7 @@ public class board {
                 b.append("\n");
             }
         }
-        return b.toString();
+        return b.toString(); // b is a string builder
     }
 
     private String[] toShapeArray(piece[] pieces) {
@@ -129,5 +140,13 @@ public class board {
 
     public int getBoardSize() {
         return this.boardSize;
+    }
+
+    public board clone() { //TODO idk whats wrong
+        return new board(this.getBoard().clone(), this.boardSize);
+    }
+
+    public piece[][] getBoard() {
+        return board;
     }
 }

@@ -33,12 +33,12 @@ public class game {
         this.board = new board(boardSize);
     }
 
-    public char play() {
-        for (int turn = 0; !this.board.isEnd(this.p1, this.p2); turn++) {
+    public String play() {
+        for (int turn = 0; !this.board.isGameEnded(this.p1, this.p2); turn++) {
             System.out.println(this.board.toString());
-            char isWin = this.board.checkWin();
-            if (isWin != 0) {
-                return isWin;
+            char whoWon = this.board.checkWin();
+            if (whoWon != 0) {
+                return whoWon == p1.getShape() ? p1.getShape() + " Won!" : p2.getShape() + " Won!";
             } else {
                 if (turn % 2 == 0) {
                     insert(this.p1);
@@ -47,21 +47,22 @@ public class game {
                 }
             }
         }
-        return 0;
+        return "Draw!";
     }
 
     private void insert(player p) {
         int i, j, pieceSizeIndex;
         do {
             System.out.println(p.getPiecesString());
-            System.out.println("Enter i index for player " + p.getNum() + ": ");
+            System.out.println("Enter i index for player " + p.getNum() + " (" + p.getShape() + "): ");
             i = in.nextInt();
-            System.out.println("Enter j index for player " + p.getNum() + ": ");
+            System.out.println("Enter j index for player " + p.getNum() + " (" + p.getShape() + "): ");
             j = in.nextInt();
-            System.out.println("Enter piece size for player " + p.getNum() + ": ");
+            System.out.println("Enter piece size for player " + p.getNum() + " (" + p.getShape() + "): ");
             pieceSizeIndex = in.nextInt();
         } while ((checkProblem(this.board, p, i, j, pieceSizeIndex)));
         this.board.insert(p, i, j, pieceSizeIndex);
+        p.getPieces()[pieceSizeIndex] = new piece();
     }
 
     /**
@@ -74,17 +75,15 @@ public class game {
      */
     public boolean checkProblem(board b, player p, int i, int j, int pieceSizeIndex) {
         int s = b.getBoardSize();
-        boolean check1 = p.getPiece(pieceSizeIndex) == null;
-        boolean check2 = 0 > i || i >= s || 0 > j || j >= s;
-        boolean check3 = b.get(i, j).getShape() == p.getShape();
-//        System.out.println("i: " + i + ", j:" + j);
-//        System.out.println(p.getShape() + " " + b.get(i, j).getSize() + ", " + p.getPiecesString() + "," + pieceSizeIndex);
-        boolean check4 = p.getPiece(pieceSizeIndex) == null || b.get(i, j).getSize() >= p.getPiece(pieceSizeIndex).getSize();
-//        System.out.println("c1: " + check1 + ", c2: " + check2 + ", c3: " + check3 + ", c4: " + check4);
-        return check1 || check2 || check3 || check4;
+        return (p.getPiece(pieceSizeIndex) == null)
+                || (0 > i || i >= s || 0 > j || j >= s)
+                || (b.get(i, j).getShape() == p.getShape())
+                || (p.getPiece(pieceSizeIndex) == null)
+                || (b.get(i, j).getSize() >= p.getPiece(pieceSizeIndex).getSize())
+                || (p.getPiece(pieceSizeIndex).getSize() < 0);
     }
 
-
+    public String gameTree() { return gameTree(this.board.clone(), 0, this.p1.clone(), this.p2.clone(), 0, 0, 0, 0, 0, 0); }
 
     public String gameTree(board b, player p1, player p2) {
         return gameTree(b, 0, p1, p2, 0, 0, 0, 0, 0, 0);
@@ -99,32 +98,34 @@ public class game {
      * @param p1j              - player 1 placing j index
      * @param p2i              - player 2 placing i index
      * @param p2j              - player 2 placing j index
-     * @param p1pieceSizeIndex - player 1 piece size
-     * @param p2pieceSizeIndex - player 2 piece size
+     * @param p1pieceSizeIndex - player 1 piece size index
+     * @param p2pieceSizeIndex - player 2 piece size index
      * @return Game tree
      */
     public String gameTree(board b, int turn, player p1, player p2, int p1i, int p1j, int p2i, int p2j, int p1pieceSizeIndex, int p2pieceSizeIndex) {
-        String data = "p1: \ti: " + p1i + ", j: " + p1j + ", p1k: " + p1pieceSizeIndex + "\np2: \ti: " + p2i + ", j: " + p2j + ", p2k: " + p2pieceSizeIndex;
         System.out.println(b.toString());
         String ret = "";
+        if (b.isGameEnded(p1, p2)) {
+            return "";
+        }
         if (turn % 2 == 0) {
-            if (checkProblem(b, p1, p1i, p1j, p1pieceSizeIndex) || b.isEnd(p1, p2)) {
+            if (checkProblem(b, p1, p1i, p1j, p1pieceSizeIndex)) {
                 return "";
             }
-            b.insert(p1, p1i, p1j, p1pieceSizeIndex);
-//            piece[] copy = p1.getPieces().clone();
+            b.insert(p1, p1i, p1j, p1pieceSizeIndex); //TODO something is wrong
+//            b = new board(b.insert(p1, p1i, p1j, p1pieceSizeIndex), b.getBoardSize()); //TODO idk whats wrong
             p1.getPieces()[p1pieceSizeIndex] = new piece();
             ret += "inserted piece: " + p1.getShape() + "\ti: " + p1i + ", j:" + p1j + ", size index: " + p1pieceSizeIndex + ", current piece sizes: " + p1.getPiecesString() + ":\n" + b.toString();
         } else {
-            if (checkProblem(b, p2, p2i, p2j, p2pieceSizeIndex) || b.isEnd(p1, p2)) {
+            if (checkProblem(b, p2, p2i, p2j, p2pieceSizeIndex)) {
                 return "";
             }
             b.insert(p2, p2i, p2j, p2pieceSizeIndex);
+//            b = new board(b.insert(p1, p1i, p1j, p1pieceSizeIndex), b.getBoardSize()); //TODO idk whats wrong
             p2.getPieces()[p2pieceSizeIndex] = new piece();
             ret += "inserted piece: " + p2.getShape() + "\ti: " + p2i + ", j:" + p2j + ", size index: " + p2pieceSizeIndex + ", current piece sizes: " + p2.getPiecesString() + ":\n" + b.toString();
         }
-//        System.out.println(data + "\n" + b.toString());
-        return ret + "\n" + iteration(b, turn + 1, p1, p2, p1i, p1j, p2i, p2j, p1pieceSizeIndex, p2pieceSizeIndex);
+        return ret + "\n" + iteration(b.clone(), turn + 1, p1.clone(), p2.clone(), p1i, p1j, p2i, p2j, p1pieceSizeIndex, p2pieceSizeIndex);
     }
 
     public String iteration(board b, int turn, player p1, player p2, int p1i, int p1j, int p2i, int p2j, int p1pieceSizeIndex, int p2pieceSizeIndex) {
@@ -133,9 +134,9 @@ public class game {
             for (int j = 0; j < b.getBoardSize(); j++) {
                 for (int k = 0; k < p1.getNumOfPieces(); k++) {
                     if (turn % 2 == 0) {
-                        ret += gameTree(b, turn, p1, p2, i, j, p2i, p2j, k, p2pieceSizeIndex);
+                        ret += gameTree(b.clone(), turn, p1.clone(), p2.clone(), i, j, p2i, p2j, k, p2pieceSizeIndex);
                     } else {
-                        ret += gameTree(b, turn, p1, p2, p1i, p1j, i, j, p1pieceSizeIndex, k);
+                        ret += gameTree(b.clone(), turn, p1.clone(), p2.clone(), p1i, p1j, i, j, p1pieceSizeIndex, k);
                     }
                 }
             }
